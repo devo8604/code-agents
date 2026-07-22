@@ -18,7 +18,9 @@ and organization policy remain in the target project.
 | `system_architect` | System boundaries, contracts, tradeoffs, and staged architecture decisions |
 | `api_engineer` | Python API contracts, service behavior, authorization, and tests |
 | `client_engineer` | Public Python module or SDK ergonomics, compatibility, packaging, and tests |
-| `mcp_engineer` | MCP tools, schemas, transports, error mapping, and protocol tests |
+| `ux_engineer` | Read-only user flows, information architecture, interaction design, usability, and accessibility review |
+| `ui_engineer` | Accessible, responsive interface implementation, design systems, interaction states, and frontend tests |
+| `ai_ml_engineer` | AI/ML systems, model evaluation, inference, data pipelines, and MCP server development |
 | `data_engineer` | Database design, migrations, backfills, data workflows, lineage, and quality |
 | `govcloud_engineer` | AWS GovCloud partition, service availability, IAM, networking, encryption, and infrastructure as code |
 | `security_engineer` | Threat modeling, secure design, supply-chain review, standards mapping, and evidence quality |
@@ -35,6 +37,10 @@ and organization policy remain in the target project.
 | `$plan-system-change` | Plan a feature, migration, refactor, or architectural change across system boundaries |
 | `$deliver-system-change` | Implement an approved plan with explicit ownership and staged integration |
 | `$diagnose-system-failure` | Prove the root cause of a cross-boundary failure |
+| `$audit-system-security` | Perform a read-only, threat-led repository security audit with evidence-backed findings |
+| `$remediate-security-findings` | Fix selected validated security findings and verify the original attack paths are closed |
+| `$secure-system-iteratively` | Audit, remediate, independently re-audit, and repeat until convergence or a defined blocker |
+| `$orchestrate-system-change` | Execute an approved plan through implementation, analysis, security, and convergence loops |
 | `$review-system-change` | Independently review a branch, pull request, migration, or working-tree change |
 | `$verify-current-documentation` | Verify version-, Region-, partition-, or date-sensitive external claims |
 
@@ -100,7 +106,7 @@ python3 "$ENGINEERING_TOOLKIT_ROOT/plugins/engineering-team/scripts/manage_globa
 ```
 
 The manager uses `$CODEX_HOME` when set and otherwise `$HOME/.codex`. It copies
-the 10 reusable role definitions into `agents/engineering-team/` below that
+the 12 reusable role definitions into `agents/engineering-team/` below that
 directory and adds a marked registration block to `config.toml`. It preserves
 unrelated settings and comments, refuses role-name collisions, backs up changed
 configuration under `backups/engineering-team/`, writes atomically, and refuses
@@ -173,6 +179,34 @@ Implement an approved plan:
 ```text
 Use $deliver-system-change to implement the approved import plan. Preserve
 unrelated changes, assign one writer per file, and stop before deployment.
+```
+
+Execute an approved plan through implementation, review, and security gates:
+
+```text
+Use $orchestrate-system-change to execute the approved system-change plan until
+it completes, reaches a defined blocker, or proves non-convergent.
+```
+
+Audit without changing code:
+
+```text
+Use $audit-system-security to perform a read-only, threat-led audit of this
+repository and report only validated findings.
+```
+
+Fix selected validated findings:
+
+```text
+Use $remediate-security-findings to fix findings SEC-001 and SEC-004, add
+regression tests, and independently validate the original attack paths.
+```
+
+Audit, remediate, and re-audit iteratively:
+
+```text
+Use $secure-system-iteratively with the repository as audit scope and the
+approved source and test directories as remediation write scope.
 ```
 
 Diagnose a failure without automatically changing code:
@@ -263,6 +297,14 @@ During local plugin development, update the plugin version or Codex cachebuster
 before reinstalling so the new bundle is not confused with an older cached
 copy.
 
+Version `0.8.0` replaces the public `mcp_engineer` role with
+`ai_ml_engineer`, which owns MCP server protocol and adapter work in addition to
+AI/ML systems. Existing project routing tables and prompts must replace
+`mcp_engineer` with `ai_ml_engineer`. The global-agent manager retires an old
+`mcp-engineer.toml` only when it still matches the previously recorded managed
+hash; locally modified or symlinked files are preserved and reported. Roll back
+by reinstalling the prior plugin version and its matching agent manifest.
+
 ## Repository layout
 
 ```text
@@ -287,6 +329,8 @@ From the repository root:
 ```bash
 python3 plugins/engineering-team/scripts/validate_agent_templates.py
 python3 plugins/engineering-team/scripts/validate_portable_documentation.py .
+python3 plugins/engineering-team/scripts/validate_workflow_references.py
+python3 plugins/engineering-team/scripts/validate_release_identity.py --base-ref HEAD
 python3 plugins/engineering-team/tests/run.py
 python3 /path/to/skill-creator/scripts/quick_validate.py \
   plugins/engineering-team/skills/<skill-name>

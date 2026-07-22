@@ -1,0 +1,101 @@
+{
+  "incomplete_plan": {
+    "plan_id": "plan-incomplete",
+    "outcome": "ship behavior",
+    "acceptance_criteria": [],
+    "work_packages": [],
+    "expected": "reject"
+  },
+  "scope_separation": {
+    "audit_scope": ["src", "deploy"],
+    "remediation_write_scope": ["src"],
+    "audit_observed": ["src/api.py", "deploy/service.yaml"],
+    "writes": ["src/api.py"],
+    "expected": "pass"
+  },
+  "missing_reviewer": {
+    "gate_id": "gate-no-reviewer",
+    "comparison_base": "base-1",
+    "result_revision": "result-1",
+    "scope": ["src"],
+    "criteria_ids": ["AC-1"],
+    "reviewer": null,
+    "expected": "reject"
+  },
+  "receipts": {
+    "valid": {
+      "receipt_id": "receipt-valid",
+      "command": "python -m unittest tests.test_api",
+      "working_directory": "<repo-root>",
+      "started_at": "2026-01-01T00:00:00Z",
+      "finished_at": "2026-01-01T00:00:01Z",
+      "exit_code": 0,
+      "evidence": "2 passed\n",
+      "evidence_sha256": "ec5ce487789f0bf1b922299cf02b3e3633d037e37a94d17df2b3bbbe3ed5fcc6"
+    },
+    "forged": {
+      "receipt_id": "receipt-forged",
+      "command": "python -m unittest tests.test_api",
+      "working_directory": "<repo-root>",
+      "started_at": "2026-01-01T00:00:00Z",
+      "finished_at": "2026-01-01T00:00:01Z",
+      "exit_code": 0,
+      "evidence": "1 failed\n",
+      "evidence_sha256": "ec5ce487789f0bf1b922299cf02b3e3633d037e37a94d17df2b3bbbe3ed5fcc6"
+    },
+    "missing": null
+  },
+  "accepted_risk": {
+    "finding": {
+      "root_key": "authz:object-owner",
+      "disposition": "accepted_risk",
+      "rationale": "temporary compatibility window",
+      "residual_impact": "cross-tenant read remains possible",
+      "review_condition": "remove before v2",
+      "risk_acceptor": "service-owner",
+      "approval_receipt": "approval-1"
+    },
+    "authorized_acceptors": ["security-director"],
+    "expected": "reject"
+  },
+  "convergence": {
+    "iterations": [
+      ["authz:object-owner", "input:path"],
+      ["input:path"],
+      []
+    ],
+    "max_iterations": 4,
+    "max_distinct_findings": 3,
+    "expected": "converged"
+  },
+  "non_convergence": {
+    "iterations": [
+      ["authz:object-owner"],
+      ["authz:object-owner"],
+      ["authz:object-owner"]
+    ],
+    "max_iterations": 4,
+    "max_distinct_findings": 3,
+    "expected": "non_convergent"
+  },
+  "distinct_finding_budget": {
+    "iterations": [
+      ["authz:object-owner"],
+      ["authz:object-owner", "input:path"],
+      ["input:path", "secret:log"]
+    ],
+    "max_iterations": 5,
+    "max_distinct_findings": 2,
+    "expected": "checkpoint"
+  },
+  "resume_context_loss": {
+    "ledger_path": ".codex/orchestration/run-7.jsonl",
+    "records": [
+      {"record_type": "run", "run_id": "run-7", "max_iterations": 4},
+      {"record_type": "transition", "sequence": 1, "next_status": "in_progress"},
+      {"record_type": "transition", "sequence": 2, "next_status": "checkpoint"}
+    ],
+    "conversation_claimed_status": "complete",
+    "expected_status": "checkpoint"
+  }
+}

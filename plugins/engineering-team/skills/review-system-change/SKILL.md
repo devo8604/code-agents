@@ -10,7 +10,9 @@ Review the changed behavior as a system, not as an isolated diff.
 ## Workflow
 
 1. Establish the comparison base, intended outcome, acceptance criteria,
-   repository guidance, and verification already performed.
+   repository guidance, project agent-routing matrix, and verification already
+   performed. Use routing evidence to select specialist reviewers for boundaries
+   that actually changed.
 2. Map changed files to behavior and boundaries using
    [references/review-checklist.md](references/review-checklist.md). Read enough
    surrounding code and tests to reconstruct the real execution path.
@@ -21,6 +23,8 @@ Review the changed behavior as a system, not as an isolated diff.
      availability, deployment, and compliance assumptions.
    - `security_engineer` for threat modeling, application and supply-chain
      security, control mapping, and evidence quality.
+   - `ux_engineer` for read-only user-flow, interaction, content, usability, and
+     accessibility review.
    - `docs_researcher` for version match, primary-source authority, freshness,
      deprecations, and conflicting documentation.
    - `technical_writer` for documentation accuracy, audience fit, examples,

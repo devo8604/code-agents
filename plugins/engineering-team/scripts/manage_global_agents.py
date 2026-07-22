@@ -57,6 +57,20 @@ class AgentTemplate:
         return (INSTALL_SUBDIRECTORY / self.filename).as_posix()
 
 
+@dataclass(frozen=True)
+class ManifestAgent:
+    name: str
+    filename: str
+    sha256: str
+
+
+@dataclass(frozen=True)
+class FileSnapshot:
+    path: Path
+    content: bytes | None
+    mode: int
+
+
 def sha256_bytes(content: bytes) -> str:
     return hashlib.sha256(content).hexdigest()
 
@@ -233,15 +247,52 @@ def load_install_manifest(path: Path) -> dict:
     return data
 
 
-def manifest_hash(manifest: dict, template: AgentTemplate) -> str | None:
+def manifest_agents(manifest: dict) -> list[ManifestAgent]:
     agents = manifest.get("agents", {})
     if not isinstance(agents, dict):
-        return None
-    entry = agents.get(template.name, {})
-    if not isinstance(entry, dict) or entry.get("filename") != template.filename:
-        return None
-    value = entry.get("sha256")
-    return value if isinstance(value, str) else None
+        raise ManagerError("Install manifest agents must contain a JSON object")
+    parsed: list[ManifestAgent] = []
+    seen_filenames: set[str] = set()
+    for name, entry in agents.items():
+        if not isinstance(name, str) or not re.fullmatch(r"[a-z][a-z0-9_]*", name):
+            raise ManagerError(f"Install manifest has an invalid agent name: {name!r}")
+        if not isinstance(entry, dict):
+            raise ManagerError(f"Install manifest entry for {name} must be an object")
+        filename = entry.get("filename")
+        digest = entry.get("sha256")
+        if (
+            not isinstance(filename, str)
+            or Path(filename).name != filename
+            or not filename.endswith(".toml")
+        ):
+            raise ManagerError(
+                f"Install manifest entry for {name} has an invalid filename"
+            )
+        if filename in seen_filenames:
+            raise ManagerError(f"Install manifest repeats managed filename: {filename}")
+        if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+            raise ManagerError(f"Install manifest entry for {name} has an invalid sha256")
+        seen_filenames.add(filename)
+        parsed.append(ManifestAgent(name, filename, digest))
+    return parsed
+
+
+def retired_manifest_agents(
+    manifest: dict, templates: list[AgentTemplate]
+) -> list[ManifestAgent]:
+    current = {(template.name, template.filename) for template in templates}
+    return [
+        agent
+        for agent in manifest_agents(manifest)
+        if (agent.name, agent.filename) not in current
+    ]
+
+
+def manifest_hash(manifest: dict, template: AgentTemplate) -> str | None:
+    for agent in manifest_agents(manifest):
+        if agent.name == template.name and agent.filename == template.filename:
+            return agent.sha256
+    return None
 
 
 def find_modified_targets(
@@ -274,18 +325,29 @@ def find_symlink_targets(
     ]
 
 
-def create_manifest(templates: list[AgentTemplate], version: str) -> dict:
+def create_manifest(
+    templates: list[AgentTemplate],
+    version: str,
+    retained: list[ManifestAgent] | None = None,
+) -> dict:
+    agents = {
+        template.name: {
+            "filename": template.filename,
+            "sha256": template.sha256,
+        }
+        for template in sorted(templates, key=lambda item: item.name)
+    }
+    for agent in retained or []:
+        if agent.name in agents:
+            raise ManagerError(
+                f"Cannot retain conflicting ownership entry for agent {agent.name}"
+            )
+        agents[agent.name] = {"filename": agent.filename, "sha256": agent.sha256}
     return {
         "schema_version": 1,
         "plugin": "engineering-team",
         "plugin_version": version,
-        "agents": {
-            template.name: {
-                "filename": template.filename,
-                "sha256": template.sha256,
-            }
-            for template in sorted(templates, key=lambda item: item.name)
-        },
+        "agents": dict(sorted(agents.items())),
     }
 
 
@@ -307,6 +369,21 @@ def atomic_write(path: Path, content: bytes, mode: int) -> None:
 
 def file_content_matches(path: Path, content: bytes) -> bool:
     return path.exists() and not path.is_symlink() and path.read_bytes() == content
+
+
+def snapshot_file(path: Path) -> FileSnapshot:
+    if not path.exists():
+        return FileSnapshot(path, None, 0o600)
+    return FileSnapshot(path, path.read_bytes(), path.stat().st_mode & 0o777)
+
+
+def restore_snapshot(snapshot: FileSnapshot) -> None:
+    if snapshot.content is None:
+        if snapshot.path.exists() and not snapshot.path.is_symlink():
+            snapshot.path.unlink()
+        return
+    if not file_content_matches(snapshot.path, snapshot.content):
+        atomic_write(snapshot.path, snapshot.content, snapshot.mode)
 
 
 def backup_config(config_path: Path, codex_home: Path) -> Path | None:
@@ -338,6 +415,17 @@ def install(codex_home: Path, *, dry_run: bool, force: bool) -> int:
         current_config, templates, version, config_path
     )
     manifest = load_install_manifest(manifest_path)
+    retired = retired_manifest_agents(manifest, templates)
+    retired_removable: list[ManifestAgent] = []
+    retired_preserved: list[ManifestAgent] = []
+    for agent in retired:
+        target = install_dir / agent.filename
+        if not target.exists() and not target.is_symlink():
+            continue
+        if target.is_symlink() or sha256_file(target) != agent.sha256:
+            retired_preserved.append(agent)
+        else:
+            retired_removable.append(agent)
     symlinks = find_symlink_targets(install_dir, templates)
     if symlinks:
         paths = "\n".join(f"  - {path}" for path in symlinks)
@@ -360,11 +448,13 @@ def install(codex_home: Path, *, dry_run: bool, force: bool) -> int:
         )
     ]
     manifest_content = json.dumps(
-        create_manifest(templates, version), indent=2, sort_keys=True
+        create_manifest(templates, version, retired_preserved), indent=2, sort_keys=True
     ).encode("utf-8") + b"\n"
     manifest_changed = not file_content_matches(manifest_path, manifest_content)
     config_changed = desired_config != current_config
-    has_changes = bool(role_changes or manifest_changed or config_changed)
+    has_changes = bool(
+        role_changes or retired_removable or manifest_changed or config_changed
+    )
 
     action = "Update" if was_registered else "Install"
     if dry_run:
@@ -376,6 +466,21 @@ def install(codex_home: Path, *, dry_run: bool, force: bool) -> int:
             print(f"Would write {len(role_changes)} role file(s) in {install_dir}:")
             for template in role_changes:
                 print(f"  - {template.filename}")
+        if retired:
+            print(
+                "Retired roles from the prior install manifest: "
+                + ", ".join(agent.name for agent in retired)
+            )
+        if retired_removable:
+            print(
+                f"Would remove {len(retired_removable)} "
+                "unmodified retired role file(s)"
+            )
+        if retired_preserved:
+            print(
+                f"Would preserve {len(retired_preserved)} "
+                "modified or symlinked retired role file(s)"
+            )
         if manifest_changed:
             print(f"Would update install manifest: {manifest_path}")
         if config_changed:
@@ -387,27 +492,91 @@ def install(codex_home: Path, *, dry_run: bool, force: bool) -> int:
             )
         return 0
 
-    for template in templates:
-        target = install_dir / template.filename
-        if target.is_symlink():
-            raise ManagerError(f"Refusing to replace symlinked agent file: {target}")
-        source_content = template.source_path.read_bytes()
-        if not file_content_matches(target, source_content):
-            atomic_write(target, source_content, 0o600)
-
-    if manifest_changed:
-        atomic_write(manifest_path, manifest_content, 0o600)
-
     backup = None
+    staged_retired: list[tuple[Path, Path, FileSnapshot]] = []
+    snapshots = [
+        snapshot_file(install_dir / template.filename) for template in role_changes
+    ]
     if config_changed:
-        backup = backup_config(config_path, codex_home)
-        atomic_write(config_path, desired_config.encode("utf-8"), 0o600)
+        snapshots.append(snapshot_file(config_path))
+    if manifest_changed:
+        snapshots.append(snapshot_file(manifest_path))
+    try:
+        for template in role_changes:
+            target = install_dir / template.filename
+            if target.is_symlink():
+                raise ManagerError(f"Refusing to replace symlinked agent file: {target}")
+            atomic_write(target, template.source_path.read_bytes(), 0o600)
+
+        if config_changed:
+            backup = backup_config(config_path, codex_home)
+            atomic_write(config_path, desired_config.encode("utf-8"), 0o600)
+
+        for agent in retired_removable:
+            target = install_dir / agent.filename
+            retired_snapshot = snapshot_file(target)
+            descriptor, staged_name = tempfile.mkstemp(
+                prefix=f".{target.name}.retired.", dir=install_dir
+            )
+            os.close(descriptor)
+            staged = Path(staged_name)
+            try:
+                os.replace(target, staged)
+                if staged.is_symlink() or sha256_file(staged) != agent.sha256:
+                    os.replace(staged, target)
+                    raise ManagerError(
+                        "Retired role changed during installation; preserved it: "
+                        f"{target}"
+                    )
+            except BaseException:
+                staged.unlink(missing_ok=True)
+                raise
+            staged_retired.append((target, staged, retired_snapshot))
+
+        if manifest_changed:
+            atomic_write(manifest_path, manifest_content, 0o600)
+
+        for _, staged, _ in staged_retired:
+            staged.unlink()
+    except BaseException as exc:
+        rollback_errors: list[str] = []
+        for target, staged, retired_snapshot in reversed(staged_retired):
+            try:
+                if staged.exists() or staged.is_symlink():
+                    os.replace(staged, target)
+                else:
+                    restore_snapshot(retired_snapshot)
+            except OSError as rollback_exc:
+                rollback_errors.append(f"{target}: {rollback_exc}")
+        for snapshot in reversed(snapshots):
+            try:
+                restore_snapshot(snapshot)
+            except OSError as rollback_exc:
+                rollback_errors.append(f"{snapshot.path}: {rollback_exc}")
+        if rollback_errors:
+            raise ManagerError(
+                "Install failed and transaction rollback was incomplete: "
+                + "; ".join(rollback_errors)
+            ) from exc
+        raise
 
     if not has_changes:
         completed_action = "Verified"
     else:
         completed_action = "Updated" if was_registered else "Installed"
     print(f"{completed_action} {len(templates)} global agents in {install_dir}")
+    if retired:
+        print(
+            "Retired roles from the prior install manifest: "
+            + ", ".join(agent.name for agent in retired)
+        )
+    if retired_removable:
+        print(f"Removed {len(retired_removable)} unmodified retired role file(s).")
+    if retired_preserved:
+        print(
+            f"Preserved {len(retired_preserved)} modified or symlinked "
+            "retired role file(s)."
+        )
     print(f"User-level registration: {config_path}")
     if backup is not None:
         print(f"Configuration backup: {backup}")
@@ -429,6 +598,7 @@ def status(codex_home: Path) -> int:
     )
     registration_current = registered and desired_config == current_config
     manifest = load_install_manifest(manifest_path)
+    retired = retired_manifest_agents(manifest, templates)
 
     missing: list[str] = []
     modified: list[str] = []
@@ -452,6 +622,7 @@ def status(codex_home: Path) -> int:
         and not missing
         and not modified
         and not outdated
+        and not retired
         and manifest_current
     )
     print(f"Registration: {'installed' if registered else 'not installed'}")
@@ -462,6 +633,33 @@ def status(codex_home: Path) -> int:
         print("Roles with updates available: " + ", ".join(outdated))
     if modified:
         print("Locally modified roles: " + ", ".join(modified))
+    if retired:
+        clean_retired: list[str] = []
+        preserved_retired: list[str] = []
+        missing_retired: list[str] = []
+        for agent in retired:
+            target = install_dir / agent.filename
+            if not target.exists() and not target.is_symlink():
+                missing_retired.append(agent.name)
+            elif target.is_symlink() or sha256_file(target) != agent.sha256:
+                preserved_retired.append(agent.name)
+            else:
+                clean_retired.append(agent.name)
+        if clean_retired:
+            print(
+                "Unmodified retired roles pending removal: "
+                + ", ".join(clean_retired)
+            )
+        if preserved_retired:
+            print(
+                "Modified or symlinked retired roles preserved: "
+                + ", ".join(preserved_retired)
+            )
+        if missing_retired:
+            print(
+                "Retired roles with stale ownership entries: "
+                + ", ".join(missing_retired)
+            )
     if registered and not manifest_current:
         print("Install manifest does not match the current plugin version")
     if registered and not registration_current:
@@ -486,19 +684,38 @@ def uninstall(codex_home: Path, *, dry_run: bool, force: bool) -> int:
 
     removable: list[Path] = []
     preserved: list[Path] = []
+    preserved_agents: list[ManifestAgent] = []
+    known_agents = {
+        (agent.name, agent.filename): agent for agent in manifest_agents(manifest)
+    }
+    current_hashes = {
+        (template.name, template.filename): template.sha256 for template in templates
+    }
     for template in templates:
-        target = install_dir / template.filename
+        known_agents.setdefault(
+            (template.name, template.filename),
+            ManifestAgent(template.name, template.filename, template.sha256),
+        )
+    retired_keys = {
+        (agent.name, agent.filename)
+        for agent in retired_manifest_agents(manifest, templates)
+    }
+    for key, agent in sorted(known_agents.items()):
+        target = install_dir / agent.filename
         if not target.exists() and not target.is_symlink():
             continue
         if target.is_symlink():
             preserved.append(target)
+            preserved_agents.append(agent)
             continue
         current_hash = sha256_file(target)
-        known_hashes = {template.sha256, manifest_hash(manifest, template)}
-        if force or current_hash in known_hashes:
+        # Retired roles are removed only with exact prior-manifest ownership proof.
+        known_hashes = {agent.sha256, current_hashes.get(key)}
+        if current_hash in known_hashes or (force and key not in retired_keys):
             removable.append(target)
         else:
             preserved.append(target)
+            preserved_agents.append(agent)
 
     if dry_run:
         if registered:
@@ -508,6 +725,16 @@ def uninstall(codex_home: Path, *, dry_run: bool, force: bool) -> int:
         print(f"Would remove {len(removable)} unmodified managed agent file(s)")
         if preserved:
             print(f"Would preserve {len(preserved)} modified or symlinked file(s)")
+        retired_names = [
+            agent.name
+            for agent in known_agents.values()
+            if (agent.name, agent.filename) in retired_keys
+        ]
+        if retired_names:
+            print(
+                "Retired roles from the prior install manifest: "
+                + ", ".join(retired_names)
+            )
         return 0
 
     backup = None
@@ -516,7 +743,17 @@ def uninstall(codex_home: Path, *, dry_run: bool, force: bool) -> int:
         atomic_write(config_path, desired_config.encode("utf-8"), 0o600)
     for path in removable:
         path.unlink()
-    if manifest_path.exists() and not manifest_path.is_symlink():
+    if preserved_agents:
+        retained_manifest = json.dumps(
+            create_manifest(
+                [], str(manifest.get("plugin_version", "unknown")), preserved_agents
+            ),
+            indent=2,
+            sort_keys=True,
+        ).encode("utf-8") + b"\n"
+        if not file_content_matches(manifest_path, retained_manifest):
+            atomic_write(manifest_path, retained_manifest, 0o600)
+    elif manifest_path.exists() and not manifest_path.is_symlink():
         manifest_path.unlink()
     if install_dir.exists():
         try:
@@ -529,6 +766,16 @@ def uninstall(codex_home: Path, *, dry_run: bool, force: bool) -> int:
     else:
         print("No user-level registration was present.")
     print(f"Removed {len(removable)} unmodified managed agent file(s).")
+    retired_names = [
+        agent.name
+        for agent in known_agents.values()
+        if (agent.name, agent.filename) in retired_keys
+    ]
+    if retired_names:
+        print(
+            "Retired roles from the prior install manifest: "
+            + ", ".join(retired_names)
+        )
     if preserved:
         print("Preserved modified or symlinked files:")
         for path in preserved:

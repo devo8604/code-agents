@@ -1,0 +1,4 @@
+interface:
+  display_name: "Remediate Security Findings"
+  short_description: "Fix validated findings with regression tests"
+  default_prompt: "Use $remediate-security-findings to fix the selected validated security findings and verify the remediations."

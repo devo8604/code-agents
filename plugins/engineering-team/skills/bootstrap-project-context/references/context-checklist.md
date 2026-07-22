@@ -17,6 +17,19 @@ filling them with generic advice.
 - Security boundary, data classification, threat model, and applicable standards
   or contractual control baselines
 
+## Agent selection evidence
+
+- Detected task signals and boundaries: architecture, API, client, AI/ML, MCP,
+  UI, UX, accessibility, data, infrastructure, security, documentation, quality,
+  and version-sensitive external research
+- Primary implementation role for each owned path, public contract, migration,
+  schema, generated artifact, and documentation surface
+- Read-only analysis and independent-review roles required for each boundary
+- Commands and evidence each role must return before its work is accepted
+- Roles unavailable globally, unnecessary for this project, or requiring a
+  project-specific override, with the evidence and reason
+- Ownership conflicts and sequencing constraints that prevent concurrent edits
+
 ## Architecture and execution
 
 - Process entry points and request or event flows
@@ -39,7 +52,8 @@ filling them with generic advice.
 - Portable path convention: project-relative paths, `$HOME`, `<repo-root>`, or
   the appropriate Windows home variable; no user-specific absolute home paths
 - Documentation evidence ledger location, validation command, ownership, and
-  freshness expectations
+  freshness expectations; if the installed validator path is unknown, record
+  that unresolved rather than documenting a placeholder command
 - Required local services and deterministic fixtures
 - CI jobs that define acceptance
 
@@ -64,8 +78,9 @@ filling them with generic advice.
 
 ## Durable output
 
-Put verified, stable instructions in `AGENTS.md`. Put Codex settings and custom
-agent definitions in `.codex/`. Put detailed domain or workflow knowledge in
-project-scoped skills. Do not duplicate large documentation that already has a
+Put verified, stable instructions and the project-specific agent-routing matrix
+in `AGENTS.md`. Put Codex settings and custom agent definitions in `.codex/`.
+Put detailed domain or workflow knowledge in project-scoped skills. Do not
+duplicate reusable role definitions or large documentation that already has a
 clear canonical location; link to it and explain when to read it. Keep paths
 portable and do not copy user-specific absolute paths from tool output.

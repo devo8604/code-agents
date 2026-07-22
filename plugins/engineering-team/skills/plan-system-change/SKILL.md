@@ -20,10 +20,14 @@ target repository.
    MCP, protocol, configuration, event, command, and data contracts and the
    consumers that rely on them.
 3. Delegate independent read-only analysis when two or more boundaries are
-   materially affected. Prefer `system_architect`, `data_engineer`,
-   `govcloud_engineer`, `security_engineer`, `technical_writer`, and
-   `docs_researcher` for their specialties; use scoped explorer agents when
-   custom roles are unavailable. Tell each agent to return evidence,
+   materially affected. Use the project `AGENTS.md` agent-routing matrix when
+   present and confirm its task signals match the requested scope. Prefer
+   `system_architect`, `data_engineer`,
+   `govcloud_engineer`, `security_engineer`, `ux_engineer`, `technical_writer`,
+   and `docs_researcher` for their specialties; use scoped explorer agents when
+   custom roles are unavailable. Use `ux_engineer` read-only for user flows,
+   interaction requirements, and accessibility acceptance criteria. Tell each
+   agent to return evidence,
    assumptions, risks, and file references. Wait for all relevant results.
 4. Invoke `$verify-current-documentation` for every material external claim that
    varies by version, date, Region, partition, edition, or configuration. Do not
