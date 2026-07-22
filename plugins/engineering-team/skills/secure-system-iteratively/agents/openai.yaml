@@ -1,0 +1,4 @@
+interface:
+  display_name: "Secure System Iteratively"
+  short_description: "Audit, remediate, and re-audit in a loop"
+  default_prompt: "Use $secure-system-iteratively to audit this repository, remediate validated findings, and repeat until the defined stop condition is met."

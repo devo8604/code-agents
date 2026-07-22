@@ -24,7 +24,9 @@ rollback plan.
 ## Orchestration
 
 1. Read applicable repository instructions, inspect worktree state, and preserve
-   unrelated changes.
+   unrelated changes. Use the project `AGENTS.md` agent-routing matrix when
+   present, but treat it as selection evidence rather than edit or deployment
+   authority.
 2. Convert the plan into bounded assignments using
    [references/work-package-contract.md](references/work-package-contract.md).
    Assign each file, contract, migration, and generated artifact to exactly one
@@ -32,7 +34,12 @@ rollback plan.
 3. Use relevant custom roles when available:
    - `api_engineer` for API contracts and service behavior.
    - `client_engineer` for the public Python module or SDK.
-   - `mcp_engineer` for MCP tools, schemas, transports, and error mapping.
+   - `ux_engineer` for read-only flow, interaction, usability, content, and
+     accessibility guidance and review.
+   - `ui_engineer` for accessible interface components, responsive behavior,
+     design systems, interaction states, and frontend tests.
+   - `ai_ml_engineer` for AI/ML systems, evaluation, inference, data pipelines,
+     and MCP servers, including tools, schemas, transports, and error mapping.
    - `data_engineer` for schema, migration, backfill, lineage, and data quality.
    - `govcloud_engineer` for GovCloud infrastructure and delivery design.
    - `security_engineer` for read-only threat, control, and evidence review.

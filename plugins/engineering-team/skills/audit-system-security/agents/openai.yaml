@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit System Security"
+  short_description: "Audit repository security with evidence"
+  default_prompt: "Use $audit-system-security to perform a read-only security audit of this repository."

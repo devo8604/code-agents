@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-22",
+  "scope": "Accessibility standards used by the reusable UI and UX engineer agent templates.",
+  "claims": [
+    {
+      "id": "accessibility.wcag22-aa-target",
+      "claim": "WCAG 2.2 is a W3C Recommendation with testable A, AA, and AAA success criteria, and W3C recommends adopting WCAG 2.2 as the current conformance target.",
+      "required": true,
+      "project_evidence": [
+        {
+          "locator": "user request",
+          "value": "The UI and UX engineer roles must account for accessibility standards."
+        }
+      ],
+      "target": {
+        "product": "Web Content Accessibility Guidelines",
+        "version": "2.2",
+        "configuration": "Level AA default engineering target unless project requirements specify another target"
+      },
+      "source": {
+        "type": "primary",
+        "url": "https://www.w3.org/TR/WCAG22/",
+        "title": "Web Content Accessibility Guidelines (WCAG) 2.2",
+        "version": "W3C Recommendation 12 December 2024",
+        "retrieved_at": "2026-07-22",
+        "valid_until": "2027-08-20",
+        "section": "Abstract; Introduction; Conformance Requirements",
+        "authority_evidence": "The normative specification is published by W3C on w3.org.",
+        "target_match_evidence": "The source is the versioned WCAG 2.2 Recommendation selected for these role templates.",
+        "volatility": "versioned",
+        "freshness_rationale": "The role pins the versioned WCAG 2.2 Recommendation rather than an unversioned summary."
+      },
+      "evidence": "WCAG 2.2 defines testable success criteria and conformance levels, and its introduction recommends adoption of WCAG 2.2 as the new conformance target.",
+      "decision": "Use WCAG 2.2 Level AA as the default engineering target while requiring project-specific obligations to override it and prohibiting unsupported conformance claims.",
+      "confidence": "verified"
+    },
+    {
+      "id": "accessibility.apg-informative-guidance",
+      "claim": "The WAI-ARIA Authoring Practices Guide provides patterns for semantics and keyboard interaction but is informative guidance, not a normative accessibility standard or UI design system.",
+      "required": true,
+      "project_evidence": [
+        {
+          "locator": "plugins/engineering-team/templates/custom-agents",
+          "value": "The UI and UX roles need implementation guidance for accessible custom widgets without conflating guidance with conformance."
+        }
+      ],
+      "target": {
+        "product": "ARIA Authoring Practices Guide",
+        "version": "current living guide as retrieved 2026-07-22",
+        "configuration": "Accessible web patterns, semantics, and keyboard interaction"
+      },
+      "source": {
+        "type": "primary",
+        "url": "https://www.w3.org/WAI/ARIA/apg/about/introduction/",
+        "title": "ARIA Authoring Practices Guide: Introduction",
+        "version": "living W3C WAI guidance retrieved 2026-07-22",
+        "retrieved_at": "2026-07-22",
+        "valid_until": "2026-11-19",
+        "section": "Purpose of the APG; APG is Not a Normative Standard; APG is not a UI Design System",
+        "authority_evidence": "The guide is published by the W3C Web Accessibility Initiative on w3.org.",
+        "target_match_evidence": "The source describes the current APG used for accessible semantics, widget patterns, and keyboard guidance.",
+        "volatility": "living",
+        "freshness_rationale": "APG is maintained as living guidance, so it receives the policy maximum 120-day review window."
+      },
+      "evidence": "APG synthesizes accessible web pattern guidance and keyboard conventions while stating that it is not a normative standard or UI design system.",
+      "decision": "Use APG to inform custom-widget behavior only after preferring native semantics; never cite APG use as proof of WCAG conformance.",
+      "confidence": "verified"
+    }
+  ]
+}

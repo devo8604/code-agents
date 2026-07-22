@@ -1,0 +1,4 @@
+interface:
+  display_name: "Orchestrate System Change"
+  short_description: "Execute plans through delivery and security loops"
+  default_prompt: "Use $orchestrate-system-change to execute the approved system-change plan through implementation, analysis, and security convergence."

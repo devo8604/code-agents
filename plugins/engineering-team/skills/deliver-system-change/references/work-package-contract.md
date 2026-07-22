@@ -25,6 +25,11 @@ Give every implementation agent a bounded assignment with these fields.
 - Do not allow client, MCP, or API agents to create competing schema definitions.
 - Let the data engineer own database migrations and data workflows; other agents
   consume the agreed persistence contract.
+- Let the AI/ML engineer own model behavior, evaluation criteria, retrieval
+  semantics, inference integration, and MCP protocol or adapter contracts. Let
+  the data engineer own persistence, ingestion execution, pipeline operations,
+  lineage, and migrations. Establish shared data contracts first and assign one
+  owner to each contract and artifact.
 - Let the GovCloud engineer own infrastructure-as-code changes and partition
   review; application agents provide runtime requirements.
 - Keep the security engineer independent and read-only. Implementation owners
