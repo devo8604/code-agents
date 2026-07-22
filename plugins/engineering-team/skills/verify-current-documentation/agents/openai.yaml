@@ -1,0 +1,4 @@
+interface:
+  display_name: "Verify Current Documentation"
+  short_description: "Verify version-matched primary documentation"
+  default_prompt: "Use $verify-current-documentation to verify the external APIs and platform behavior this change depends on."

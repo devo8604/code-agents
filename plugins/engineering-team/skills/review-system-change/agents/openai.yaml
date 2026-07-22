@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review System Change"
+  short_description: "Review correctness across all boundaries"
+  default_prompt: "Use $review-system-change to independently review this change and its verification evidence."

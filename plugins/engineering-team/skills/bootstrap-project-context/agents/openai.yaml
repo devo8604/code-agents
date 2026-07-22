@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bootstrap Project Context"
+  short_description: "Prepare a repository for agent teamwork"
+  default_prompt: "Use $bootstrap-project-context to prepare this repository for coordinated agent development."

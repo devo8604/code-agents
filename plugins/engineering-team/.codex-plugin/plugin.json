@@ -1,0 +1,25 @@
+{
+  "name": "engineering-team",
+  "version": "0.7.0+codex.20260719011357",
+  "description": "Coordinate specialized agents to plan, deliver, secure, diagnose, and review complex software systems.",
+  "author": {
+    "name": "Local engineering team"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Engineering Team",
+    "shortDescription": "Coordinate complex delivery with specialist agents.",
+    "longDescription": "Install reusable specialist agents globally, then plan and deliver changes across application, API, client, protocol, data, infrastructure, security, documentation, and quality boundaries with stable public contracts, explicit ownership, current primary-source evidence, and independent verification.",
+    "developerName": "Local engineering team",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Plan a complex change across system boundaries.",
+      "Coordinate an end-to-end implementation.",
+      "Review this change for cross-system risks."
+    ]
+  }
+}

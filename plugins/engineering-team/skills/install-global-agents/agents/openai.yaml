@@ -1,0 +1,4 @@
+interface:
+  display_name: "Install Global Agents"
+  short_description: "Install reusable agents for every project"
+  default_prompt: "Use $install-global-agents to install the Engineering Team agents in my user-level Codex configuration."

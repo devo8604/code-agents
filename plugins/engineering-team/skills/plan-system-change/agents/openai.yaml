@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan System Change"
+  short_description: "Plan changes across system boundaries"
+  default_prompt: "Use $plan-system-change to create an evidence-based implementation plan for this change."

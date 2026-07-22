@@ -1,0 +1,4 @@
+interface:
+  display_name: "Diagnose System Failure"
+  short_description: "Trace failures across service boundaries"
+  default_prompt: "Use $diagnose-system-failure to find the root cause of this cross-system failure."

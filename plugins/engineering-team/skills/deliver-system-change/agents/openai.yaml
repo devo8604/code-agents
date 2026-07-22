@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deliver System Change"
+  short_description: "Coordinate safe end-to-end implementation"
+  default_prompt: "Use $deliver-system-change to implement this change across all affected system surfaces."
