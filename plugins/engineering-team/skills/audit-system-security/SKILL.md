@@ -43,6 +43,7 @@ supported by repository or authorized external evidence.
 4. Use the resolved routing matrix to select independent passes only where the
    scope warrants them: `security_engineer` for threat-led audit;
    `ai_ml_engineer` for AI/ML and MCP; `data_engineer` for data boundaries;
+   `devsecops_engineer` for read-only delivery-topology evidence;
    `govcloud_engineer` for GovCloud; and `docs_researcher` for primary evidence.
    Prefer capability-read-only roles. A prompt does not capability-enforce
    read-only operation for a workspace-write specialist: constrain the task,

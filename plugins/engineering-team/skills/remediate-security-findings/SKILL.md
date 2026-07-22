@@ -53,7 +53,9 @@ the vulnerable behavior no longer succeeds.
    artifact to exactly one writer.
 5. Use the resolved project routing matrix to choose the narrowest available
    owner: `api_engineer`, `client_engineer`, `ai_ml_engineer`, `data_engineer`,
-   `govcloud_engineer`, or `technical_writer`. Keep an independent
+   `devsecops_engineer`, `govcloud_engineer`, or `technical_writer`. Use
+   `$implement-devsecops-controls` for CI/CD, build, policy, provenance, scanner,
+   and promotion-control findings. Keep an independent
    `security_engineer` for final validation. Prefer a capability-read-only
    reviewer; if it has workspace-write tools, instructions do not enforce
    read-only operation, so constrain scope, inspect for mutations, and report the

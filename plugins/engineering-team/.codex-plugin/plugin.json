@@ -1,6 +1,6 @@
 {
   "name": "engineering-team",
-  "version": "0.8.0+codex.20260722000000",
+  "version": "0.9.0+codex.20260722000000",
   "description": "Coordinate specialized agents to plan, deliver, secure, diagnose, and review complex software systems.",
   "author": {
     "name": "Local engineering team"
@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "Engineering Team",
     "shortDescription": "Coordinate complex delivery with specialist agents.",
-    "longDescription": "Install reusable specialist agents globally, then plan, implement, review, audit, remediate, and iteratively orchestrate changes across application, API, client, AI/ML, MCP, UI, UX, accessibility, data, infrastructure, security, documentation, and quality boundaries with stable public contracts, explicit ownership, current primary-source evidence, and independent verification.",
+    "longDescription": "Install reusable specialist agents globally, then plan, implement, review, audit, remediate, and iteratively orchestrate changes across application, API, client, AI/ML, MCP, UI, UX, accessibility, data, DevSecOps, infrastructure, security, documentation, and quality boundaries with stable public contracts, explicit ownership, current primary-source evidence, and independent verification.",
     "developerName": "Local engineering team",
     "category": "Productivity",
     "capabilities": [
@@ -19,6 +19,7 @@
     "defaultPrompt": [
       "Plan a complex change across system boundaries.",
       "Coordinate an end-to-end implementation.",
+      "Implement secure delivery and software-supply-chain controls.",
       "Audit and remediate repository security until a defined stop condition.",
       "Review this change for cross-system risks."
     ]

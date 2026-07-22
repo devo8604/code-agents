@@ -34,6 +34,7 @@ contracts. Validate the task's actual scope against the matrix on every use.
 | User flows, information architecture, usability, content, or accessibility | `ux_engineer` read-only | `ui_engineer` for approved implementation |
 | Database schemas, persistence, ingestion execution, migrations, backfills, pipeline operations, or lineage | `data_engineer` | `ai_ml_engineer` for model/retrieval contracts; `quality_engineer`, `security_engineer` |
 | AWS GovCloud infrastructure, IAM, network, encryption, or delivery design | `govcloud_engineer` | `security_engineer`, `docs_researcher` |
+| CI/CD workflows, build security, policy-as-code, artifact provenance, scanners, or promotion controls | `devsecops_engineer` | `security_engineer`, `quality_engineer`; `govcloud_engineer` for GovCloud |
 | Threat modeling, security audit, control mapping, or remediation validation | `security_engineer` read-only | Assigned implementation owner |
 | Version-, date-, Region-, partition-, or configuration-sensitive claims | `docs_researcher` read-only | Boundary owner consuming the evidence |
 | Standalone user or developer documentation and examples | `technical_writer` | Relevant implementation owner |
@@ -56,12 +57,16 @@ contracts. Validate the task's actual scope against the matrix on every use.
 6. Require `security_engineer` for changed trust boundaries, sensitive data,
    authorization, consequential tools, infrastructure exposure, or independent
    remediation validation.
-7. Require `quality_engineer` for independent final review of complex integrated
+7. Use `devsecops_engineer` as the writer for repository-scoped delivery security
+   automation. Keep `security_engineer` independent for requirements and
+   validation, and require separate authorization for deployments, releases,
+   repository settings, credentials, or cloud mutations.
+8. Require `quality_engineer` for independent final review of complex integrated
    changes. Add specialist reviewers for the boundaries that changed.
-8. Reuse globally installed roles. Create project-scoped overrides only when
+9. Reuse globally installed roles. Create project-scoped overrides only when
    verified project constraints cannot be expressed in `AGENTS.md` or a
    project-scoped skill.
-9. For AI/ML data work, assign model behavior, evaluation criteria, retrieval
+10. For AI/ML data work, assign model behavior, evaluation criteria, retrieval
    semantics, inference integration, and MCP adapters to `ai_ml_engineer`;
    assign persistence, ingestion execution, pipeline operations, lineage, and
    migrations to `data_engineer`. Establish their shared data contract before

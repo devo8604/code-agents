@@ -59,7 +59,9 @@ def validate_agent(path: Path, seen_names: set[str]) -> list[str]:
         seen_names.add(name)
 
     sandbox_mode = data.get("sandbox_mode")
-    if sandbox_mode is not None and sandbox_mode not in ALLOWED_SANDBOX_MODES:
+    if sandbox_mode is None:
+        errors.append(f"{path}: sandbox_mode must be explicitly declared")
+    elif sandbox_mode not in ALLOWED_SANDBOX_MODES:
         errors.append(f"{path}: unsupported sandbox_mode {sandbox_mode!r}")
 
     instructions = data.get("developer_instructions")

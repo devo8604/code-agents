@@ -72,6 +72,10 @@ residual risk, approval references, checkpoints, and resume conditions.
    Require root-cause fixes, focused regression tests that fail without the fix,
    compatibility classification, proportionate broader verification, and a
    handoff for every finding. Do not absorb unrelated hardening.
+   Route delivery-pipeline, build, policy, provenance, scanner, and promotion
+   findings through `$implement-devsecops-controls` and `devsecops_engineer`;
+   this does not authorize hosted reruns, repository-setting changes, releases,
+   deployments, credentials, or cloud mutations.
 5. **Validate:** Have an independent `security_engineer` re-trace every original
    attack path, attempt relevant bypasses safely, inspect affected adjacent sinks,
    and review the final diff for newly introduced security defects. Re-run normal

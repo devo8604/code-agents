@@ -22,7 +22,7 @@ target repository.
 3. Delegate independent read-only analysis when two or more boundaries are
    materially affected. Use the project `AGENTS.md` agent-routing matrix when
    present and confirm its task signals match the requested scope. Prefer
-   `system_architect`, `data_engineer`,
+   `system_architect`, `data_engineer`, `devsecops_engineer`,
    `govcloud_engineer`, `security_engineer`, `ux_engineer`, `technical_writer`,
    and `docs_researcher` for their specialties; use scoped explorer agents when
    custom roles are unavailable. Use `ux_engineer` read-only for user flows,
@@ -47,7 +47,10 @@ target repository.
    artifact, and file set. Never plan concurrent edits to the same ownership
    boundary.
 8. Include rollout and recovery for database, data workflow, container, and
-   infrastructure changes. Link required documentation claims to the work
+   infrastructure changes. Assign repository-scoped CI/CD, policy, provenance,
+   scanning, and promotion-control implementation to `devsecops_engineer` while
+   keeping deployment, release, repository-settings, credential, and cloud
+   mutations separately authorization-gated. Link required documentation claims to the work
    packages that depend on them.
 9. Challenge the plan with failure scenarios, upgrade and downgrade behavior,
    partial deployment states, observability gaps, and testability. Revise until

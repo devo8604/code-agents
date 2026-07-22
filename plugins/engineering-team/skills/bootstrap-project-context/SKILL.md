@@ -47,7 +47,8 @@ project conventions or replacing useful repository guidance.
    repository constraints require an override. Do not install personal agents
    or replace same-named files without explicit approval. Include
    `docs_researcher` when work depends on external versioned or rapidly changing
-   systems.
+   systems. Include `devsecops_engineer` when the repository contains material
+   CI/CD, policy-as-code, provenance, scanner, or secure-promotion ownership.
 8. Tailor agent descriptions and instructions only when repository evidence
    justifies a project-specific constraint. Keep reusable behavior in the
    template.

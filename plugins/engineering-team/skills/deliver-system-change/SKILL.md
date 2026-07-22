@@ -42,6 +42,8 @@ rollback plan.
      and MCP servers, including tools, schemas, transports, and error mapping.
    - `data_engineer` for schema, migration, backfill, lineage, and data quality.
    - `govcloud_engineer` for GovCloud infrastructure and delivery design.
+   - `devsecops_engineer` for CI/CD, build security, policy-as-code, provenance,
+     scanners, secure promotion controls, and repository delivery automation.
    - `security_engineer` for read-only threat, control, and evidence review.
    - `docs_researcher` for target-matched primary documentation evidence.
    - `technical_writer` for user, developer, API, MCP, and code documentation.
@@ -66,7 +68,10 @@ rollback plan.
    preserving existing behavior. Avoid duplicating transport or domain logic.
 4. Implement container and infrastructure-as-code changes only when in scope.
    Verify current service availability and partition-specific behavior for
-   GovCloud. Do not mutate cloud resources.
+   GovCloud. Route delivery-security automation through
+   `$implement-devsecops-controls`. Do not mutate cloud resources, repository
+   settings, credentials, environments, releases, or deployments without
+   separate authorization.
 5. Integrate agent handoffs centrally. Inspect every diff, resolve overlap, and
    run narrow tests before broader suites.
 6. Exercise normal, invalid, unauthorized, partial-failure, retry, concurrency,
@@ -82,7 +87,8 @@ rollback plan.
    environments, configuration, or authoritative documentation changed during
    delivery.
 9. Delegate a final read-only review to `quality_engineer`, plus
-   `data_engineer`, `govcloud_engineer`, or `security_engineer` when their
+   `data_engineer`, `devsecops_engineer`, `govcloud_engineer`, or
+   `security_engineer` when their
    boundaries or risks changed. Address actionable findings and rerun affected
    verification.
 

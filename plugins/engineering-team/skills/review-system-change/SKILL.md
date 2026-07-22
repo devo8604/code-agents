@@ -21,6 +21,8 @@ Review the changed behavior as a system, not as an isolated diff.
    - `data_engineer` for schema, migration, workflow, and recovery risks.
    - `govcloud_engineer` for partition, IAM, network, encryption, service
      availability, deployment, and compliance assumptions.
+   - `devsecops_engineer` for CI/CD behavior, build and release automation,
+     provenance, scanners, policy-as-code, and promotion-control correctness.
    - `security_engineer` for threat modeling, application and supply-chain
      security, control mapping, and evidence quality.
    - `ux_engineer` for read-only user-flow, interaction, content, usability, and
@@ -31,6 +33,11 @@ Review the changed behavior as a system, not as an isolated diff.
      terminology, and missing migration or usage guidance.
    Use scoped reviewer agents when custom roles are unavailable. Wait for all
    passes, verify their findings, and remove duplicates.
+   A `devsecops_engineer` reviewer must be a different agent from every writer
+   in the reviewed scope. Because the role is workspace-write capable, constrain
+   it to review-only actions, compare the worktree before and after its pass, and
+   report any mutation as a failed independence gate. Use `security_engineer`
+   for independent security conclusions and risk dispositions.
 4. Check shared contracts end to end: server schema, client surface, MCP tool,
    persistence model, errors, authorization, compatibility, and rollout states.
    Compare the before and after public surface, including signatures, schemas,

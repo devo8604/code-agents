@@ -58,6 +58,10 @@ Repeat this cycle for the next dependency-ready slice:
    dependencies, acceptance criteria, public-contract impact, evidence, tests,
    and handoff. Assign each file, migration, schema, lockfile, generated artifact,
    and public contract to exactly one writer.
+   When the slice owns CI/CD, build security, policy-as-code, provenance,
+   scanners, or promotion controls, route that bounded package through
+   `$implement-devsecops-controls` with `devsecops_engineer` as writer and keep
+   external delivery actions separately authorization-gated.
 2. **Integrate:** Inspect every handoff and diff centrally. Resolve ownership
    boundaries, run focused tests, then execute the slice's broader verification.
    Do not mark plan items complete from agent reports alone.

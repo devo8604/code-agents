@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implement DevSecOps Controls"
+  short_description: "Implement secure delivery and supply-chain controls"
+  default_prompt: "Use $implement-devsecops-controls to improve repository delivery controls without deploying."

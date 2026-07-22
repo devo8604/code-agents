@@ -19,7 +19,10 @@ Prove the failing boundary and root cause before proposing remediation.
    and cloud-control-plane failures.
 4. When the search space has independent branches, delegate read-only evidence
    collection to relevant specialists. Give each agent one hypothesis family
-   and require commands, logs, file references, and disconfirming evidence.
+   and require commands, logs, file references, and disconfirming evidence. Use
+   `devsecops_engineer` for CI/CD, runner, build, artifact, scanner, policy, and
+   promotion-path failures; diagnosis alone does not authorize pipeline edits
+   or external reruns.
 5. When a hypothesis depends on version-specific external behavior, invoke
    `$verify-current-documentation` or delegate to `docs_researcher`. Match the
    actual environment version and configuration; do not diagnose from latest

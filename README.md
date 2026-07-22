@@ -23,6 +23,7 @@ and organization policy remain in the target project.
 | `ai_ml_engineer` | AI/ML systems, model evaluation, inference, data pipelines, and MCP server development |
 | `data_engineer` | Database design, migrations, backfills, data workflows, lineage, and quality |
 | `govcloud_engineer` | AWS GovCloud partition, service availability, IAM, networking, encryption, and infrastructure as code |
+| `devsecops_engineer` | Secure CI/CD, policy-as-code, software-supply-chain controls, provenance, and delivery automation |
 | `security_engineer` | Threat modeling, secure design, supply-chain review, standards mapping, and evidence quality |
 | `docs_researcher` | Read-only research against current, target-matched primary documentation |
 | `technical_writer` | User README content, developer documentation, examples, docstrings, and durable comments |
@@ -37,6 +38,7 @@ and organization policy remain in the target project.
 | `$plan-system-change` | Plan a feature, migration, refactor, or architectural change across system boundaries |
 | `$deliver-system-change` | Implement an approved plan with explicit ownership and staged integration |
 | `$diagnose-system-failure` | Prove the root cause of a cross-boundary failure |
+| `$implement-devsecops-controls` | Implement secure CI/CD, provenance, scanning, policy, and promotion controls without deploying |
 | `$audit-system-security` | Perform a read-only, threat-led repository security audit with evidence-backed findings |
 | `$remediate-security-findings` | Fix selected validated security findings and verify the original attack paths are closed |
 | `$secure-system-iteratively` | Audit, remediate, independently re-audit, and repeat until convergence or a defined blocker |
@@ -106,7 +108,7 @@ python3 "$ENGINEERING_TOOLKIT_ROOT/plugins/engineering-team/scripts/manage_globa
 ```
 
 The manager uses `$CODEX_HOME` when set and otherwise `$HOME/.codex`. It copies
-the 12 reusable role definitions into `agents/engineering-team/` below that
+the 13 reusable role definitions into `agents/engineering-team/` below that
 directory and adds a marked registration block to `config.toml`. It preserves
 unrelated settings and comments, refuses role-name collisions, backs up changed
 configuration under `backups/engineering-team/`, writes atomically, and refuses
@@ -179,6 +181,14 @@ Implement an approved plan:
 ```text
 Use $deliver-system-change to implement the approved import plan. Preserve
 unrelated changes, assign one writer per file, and stop before deployment.
+```
+
+Implement repository-scoped delivery security controls:
+
+```text
+Use $implement-devsecops-controls to harden CI/CD permissions, pin third-party
+automation, add provenance and policy checks, and verify failure behavior. Do
+not deploy, publish artifacts, change repository settings, or rotate secrets.
 ```
 
 Execute an approved plan through implementation, review, and security gates:

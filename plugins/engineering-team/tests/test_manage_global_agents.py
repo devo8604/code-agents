@@ -22,6 +22,7 @@ EXPECTED_ROLES = {
     "api_engineer",
     "client_engineer",
     "data_engineer",
+    "devsecops_engineer",
     "docs_researcher",
     "govcloud_engineer",
     "quality_engineer",
@@ -51,6 +52,13 @@ class GlobalAgentManagerTests(unittest.TestCase):
 
     def tearDown(self) -> None:
         self.temporary_directory.cleanup()
+
+    def test_every_role_declares_an_explicit_sandbox_mode(self) -> None:
+        expected_modes = {"read-only", "workspace-write", "danger-full-access"}
+        for path in sorted((PLUGIN_ROOT / "templates" / "custom-agents").glob("*.toml")):
+            with self.subTest(role=path.name):
+                data = tomllib.loads(path.read_text(encoding="utf-8"))
+                self.assertIn(data.get("sandbox_mode"), expected_modes)
 
     def run_manager(self, *arguments: str, expected: int = 0) -> subprocess.CompletedProcess[str]:
         result = subprocess.run(
@@ -214,7 +222,7 @@ class GlobalAgentManagerTests(unittest.TestCase):
 
         installed = self.run_manager("install")
 
-        self.assertIn("Updated 12 global agents", installed.stdout)
+        self.assertIn("Updated 13 global agents", installed.stdout)
         self.assertFalse(retired.exists())
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         self.assertEqual(set(manifest["agents"]), EXPECTED_ROLES)
@@ -325,7 +333,7 @@ class GlobalAgentManagerTests(unittest.TestCase):
 
         result = self.run_manager("install")
 
-        self.assertIn("Updated 12 global agents", result.stdout)
+        self.assertIn("Updated 13 global agents", result.stdout)
         self.assertTrue(retired.is_symlink())
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         self.assertIn("mcp_engineer", manifest["agents"])
