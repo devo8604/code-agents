@@ -12,6 +12,8 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures" / "workflow_contract_sce
 ORCHESTRATOR = PLUGIN_ROOT / "skills" / "orchestrate-system-change" / "SKILL.md"
 LEDGER = ORCHESTRATOR.parent / "references" / "orchestration-ledger.md"
 GATE = PLUGIN_ROOT / "skills" / "review-system-change" / "references" / "gate-record.md"
+BOOTSTRAP = PLUGIN_ROOT / "skills" / "bootstrap-project-context" / "SKILL.md"
+REFRESH = BOOTSTRAP.parent / "references" / "refresh-protocol.md"
 
 
 def valid_plan(plan: dict) -> bool:
@@ -144,6 +146,14 @@ class WorkflowContractTests(unittest.TestCase):
 
     def test_incomplete_plan_is_rejected_before_execution(self) -> None:
         self.assertFalse(valid_plan(self.scenarios["incomplete_plan"]))
+
+    def test_bootstrap_refresh_reconciles_git_drift_and_full_tree(self) -> None:
+        contract = BOOTSTRAP.read_text(encoding="utf-8") + REFRESH.read_text(encoding="utf-8")
+        for phrase in (
+            "Project context freshness", "current `HEAD`", "current-tree rescan",
+            "uncommitted and untracked", "human-policy", "Invalidate or refresh",
+        ):
+            self.assertIn(phrase, contract)
 
     def test_audit_and_remediation_scopes_remain_separate(self) -> None:
         scenario = self.scenarios["scope_separation"]

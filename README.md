@@ -34,7 +34,7 @@ and organization policy remain in the target project.
 | Skill | Use it for |
 | --- | --- |
 | `$install-global-agents` | Install, update, inspect, or remove reusable agents for the current user |
-| `$bootstrap-project-context` | Onboard a repository and add only necessary project-specific overrides |
+| `$bootstrap-project-context` | Onboard or rescan a repository, reconcile stale context, and add only necessary project-specific overrides |
 | `$plan-system-change` | Plan a feature, migration, refactor, or architectural change across system boundaries |
 | `$deliver-system-change` | Implement an approved plan with explicit ownership and staged integration |
 | `$diagnose-system-failure` | Prove the root cause of a cross-boundary failure |
